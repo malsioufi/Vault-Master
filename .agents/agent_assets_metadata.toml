@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "fMQYK8ARK2vxdcFal-qMz"
+uri = "file://artifacts/vault-breaker/assets/images/icon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ty1fP-wDuXZyIt4FicefU"
+uri = "file://artifacts/vault-breaker/assets/images/splash.png"
+type = "image"
+title = "generated_image"

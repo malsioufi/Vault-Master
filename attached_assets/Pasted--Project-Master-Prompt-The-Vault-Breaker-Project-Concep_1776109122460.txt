@@ -1,0 +1,44 @@
+# Project Master Prompt: "The Vault Breaker"
+
+**Project Concept:**
+Build a high-polish, cross-platform game (**Mobile App and Web App**) centered on a high-stakes hacking theme. Players act as "Vault Breakers" trying to crack a hidden numerical security code through logic and deduction.
+
+### 1. The Theme & Aesthetic: "Cyber-Terminal"
+The design must evoke cyberpunk terminals, *Matrix*-style interfaces, and hacking games like *Hacknet*.
+* **Visual Palette:** Dark background (`#0a0e17`), neon green (`#00ff88`) primary elements, cyan (`#00d4ff`) accents.
+* **Styling:** Monospace fonts, subtle glow effects, and scan-line animations to create an immersive terminal feel.
+* **Terminology (Unordered Icons):**
+    * 🟢 **Match:** Right digit, right spot.
+    * 🟡 **Shift:** Right digit, wrong spot.
+    * 🔴 **Glitch:** Digit not present in the code at all.
+    * *Note:* Feedback icons must be displayed in a **randomized order** for every guess. The results should show the count of 🟢, 🟡, and 🔴, but never reveal which specific digit corresponds to which icon.
+
+### 2. Game Mechanics & Difficulty
+* **Numerical Focus:** The game uses numbers only.
+* **Configurable Difficulty:** When creating a room or starting a solo game, the user can configure:
+    * **Code Length:** 3, 4, 5, or 6 digits.
+    * **Duplicates:** Option to allow or disallow repeating digits in the code.
+* **Real-time Validation:** Provide instant feedback during input. If a user enters an invalid character or a duplicate (when disallowed), the UI must instantly prevent the entry or highlight the error.
+
+### 3. Modes of Play
+* **Online Multiplayer:**
+    * Real-time matchmaking via private Room Codes.
+    * **Visible Turn Timer:** A 30-second countdown for each move. If it hits zero, the turn passes automatically.
+* **Solo Mode (vs. AI):**
+    * **AI Difficulty:** Easy (random), Medium (logical elimination), and Hard (optimal mathematical strategy).
+    * **Bot Roles:** Toggle between "Active Bot" (Bot guesses back) or "Passive Bot" (Bot only generates the secret).
+* **Surrender Option:** A "Give Up" feature must be available at all times, revealing the secrets and ending the match immediately for both online and solo play.
+
+### 4. UI/UX & Localization
+* **Bilingual Support:** Full interface support for **Arabic and English**.
+* **Responsive Design:** Mobile-first approach ensuring the terminal UI is highly functional on both small screens and desktop browsers.
+* **History Log:** A visual table of all previous attempts and their respective 🟢/🟡/🔴 icon counts.
+
+### 5. Technical Requirements
+* **Platform:** Must be functional as both a **Web Application** and a **Mobile Application**. The agent is free to choose the most efficient tech stack.
+* **Security:** All game state logic and secret numbers must be managed **server-side**. Secret codes must never be exposed to the opponent’s client until the game concludes.
+* **Git Workflow:** Maintain a professional repository with frequent, descriptive, and professional commits in English.
+* **Code Quality:** Clean, modular code. No Arabic is allowed in code comments or variable names.
+
+### 6. Instructions for the Agent
+Please propose the technical architecture and begin building the core server and client structures. Ensure the real-time synchronization for the multiplayer mode is robust, the AI logic is sound, and the "Vault Breaker" UI is fully responsive and theme-consistent.
