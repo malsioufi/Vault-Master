@@ -74,12 +74,7 @@ function DigitCell({ value, index, isFocused, isError, onPress }: DigitCellProps
           {value || (isFocused ? "_" : "?")}
         </Text>
         {isFocused && (
-          <View
-            style={[
-              styles.cursor,
-              { backgroundColor: colors.primary },
-            ]}
-          />
+          <View style={[styles.cursor, { backgroundColor: colors.primary }]} />
         )}
       </Animated.View>
     </TouchableOpacity>
@@ -186,9 +181,7 @@ export function DigitInput({
     (index: number) => {
       if (disabled) return;
       setFocusedIndex(index);
-      if (Platform.OS !== "web") {
-        inputRef.current?.focus();
-      }
+      inputRef.current?.focus();
     },
     [disabled]
   );
@@ -202,64 +195,15 @@ export function DigitInput({
 
   useEffect(() => {
     if (Platform.OS !== "web") return;
-
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (tag === "input" || tag === "textarea") return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       processKey(e.key);
     };
-
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [processKey]);
-
-  const numpadRows = [
-    ["1", "2", "3"],
-    ["4", "5", "6"],
-    ["7", "8", "9"],
-    ["<", "0", "OK"],
-  ];
-
-  const handleNumpadPress = useCallback(
-    (key: string) => {
-      if (disabled) return;
-
-      if (key === "<") {
-        if (value[focusedIndex]) {
-          onRemove(focusedIndex);
-          if (focusedIndex > 0) setFocusedIndex(focusedIndex - 1);
-        } else if (focusedIndex > 0) {
-          setFocusedIndex(focusedIndex - 1);
-          onRemove(focusedIndex - 1);
-        }
-        return;
-      }
-
-      if (key === "OK") {
-        const filled = value.filter(Boolean);
-        if (filled.length === length && onSubmit) {
-          onSubmit();
-        }
-        return;
-      }
-
-      if (!allowDuplicates && value.includes(key)) {
-        triggerError(focusedIndex);
-        return;
-      }
-
-      onChange(focusedIndex, key);
-      if (Platform.OS !== "web") {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
-
-      if (focusedIndex < length - 1) {
-        setFocusedIndex(focusedIndex + 1);
-      }
-    },
-    [disabled, focusedIndex, value, allowDuplicates, onChange, onRemove, triggerError, length, onSubmit]
-  );
 
   const errorStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: errorAnim.value }],
@@ -267,12 +211,6 @@ export function DigitInput({
 
   return (
     <View style={styles.container}>
-      {Platform.OS === "web" && !disabled && (
-        <Text style={[styles.webHint, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-          type digits or use numpad
-        </Text>
-      )}
-
       <Animated.View style={[styles.cellRow, errorStyle]}>
         {Array.from({ length }).map((_, i) => (
           <DigitCell
@@ -286,61 +224,34 @@ export function DigitInput({
         ))}
       </Animated.View>
 
-      {Platform.OS !== "web" && (
-        <TextInput
-          ref={inputRef}
-          style={styles.hiddenInput}
-          onKeyPress={handleKeyPress}
-          keyboardType="number-pad"
-          caretHidden
-          editable={!disabled}
-        />
-      )}
+      <TextInput
+        ref={inputRef}
+        style={styles.hiddenInput}
+        onKeyPress={handleKeyPress}
+        keyboardType="number-pad"
+        caretHidden
+        editable={!disabled}
+        autoFocus={!disabled}
+      />
 
-      <View style={styles.numpad}>
-        {numpadRows.map((row, ri) => (
-          <View key={ri} style={styles.numpadRow}>
-            {row.map((key) => {
-              const isOK = key === "OK";
-              const isBack = key === "<";
-              const isDisabledOK =
-                isOK && value.filter(Boolean).length !== length;
-              return (
-                <TouchableOpacity
-                  key={key}
-                  style={[
-                    styles.numpadKey,
-                    {
-                      backgroundColor: isOK ? colors.primary : colors.card,
-                      borderColor: isOK ? colors.primary : colors.border,
-                      opacity: isDisabledOK || disabled ? 0.3 : 1,
-                    },
-                  ]}
-                  onPress={() => handleNumpadPress(key)}
-                  disabled={isDisabledOK || disabled}
-                  activeOpacity={0.6}
-                >
-                  <Text
-                    style={[
-                      styles.numpadKeyText,
-                      {
-                        color: isOK
-                          ? colors.primaryForeground
-                          : isBack
-                          ? colors.destructive
-                          : colors.foreground,
-                        fontFamily: "SpaceMono_400Regular",
-                      },
-                    ]}
-                  >
-                    {key}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        ))}
-      </View>
+      {!disabled && (
+        <TouchableOpacity
+          style={[
+            styles.submitBtn,
+            {
+              backgroundColor: value.filter(Boolean).length === length ? colors.primary : colors.muted,
+              opacity: value.filter(Boolean).length === length ? 1 : 0.35,
+            },
+          ]}
+          onPress={onSubmit}
+          disabled={value.filter(Boolean).length !== length}
+          activeOpacity={0.75}
+        >
+          <Text style={[styles.submitText, { color: colors.primaryForeground, fontFamily: "SpaceMono_400Regular" }]}>
+            SUBMIT
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -348,15 +259,16 @@ export function DigitInput({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    gap: 16,
+    gap: 20,
+    width: "100%",
   },
   cellRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: 10,
   },
   cell: {
-    width: 52,
-    height: 64,
+    width: 56,
+    height: 68,
     borderWidth: 1.5,
     borderRadius: 6,
     alignItems: "center",
@@ -364,7 +276,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   digit: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
   },
   cursor: {
@@ -380,32 +292,15 @@ const styles = StyleSheet.create({
     width: 1,
     height: 1,
   },
-  numpad: {
-    gap: 8,
-    width: "100%",
-    maxWidth: 280,
-  },
-  numpadRow: {
-    flexDirection: "row",
-    gap: 8,
-    justifyContent: "center",
-  },
-  numpadKey: {
-    flex: 1,
-    height: 52,
-    borderWidth: 1,
+  submitBtn: {
+    paddingVertical: 16,
+    paddingHorizontal: 48,
     borderRadius: 6,
     alignItems: "center",
-    justifyContent: "center",
-    maxWidth: 84,
   },
-  numpadKeyText: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  webHint: {
-    fontSize: 10,
-    letterSpacing: 1,
-    opacity: 0.6,
+  submitText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    letterSpacing: 3,
   },
 });
