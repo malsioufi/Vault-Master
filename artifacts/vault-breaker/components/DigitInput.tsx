@@ -114,6 +114,14 @@ export function DigitInput({
   useEffect(() => { valueRef.current = value; }, [value]);
   useEffect(() => { disabledRef.current = disabled; }, [disabled]);
 
+  useEffect(() => {
+    const allEmpty = value.every((v) => !v);
+    if (allEmpty) {
+      setFocusedIndex(0);
+      focusedIndexRef.current = 0;
+    }
+  }, [value]);
+
   const triggerError = useCallback((index: number) => {
     setErrorIndex(index);
     if (Platform.OS !== "web") {
