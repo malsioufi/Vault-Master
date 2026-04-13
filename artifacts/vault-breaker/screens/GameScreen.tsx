@@ -144,7 +144,7 @@ export function GameScreen() {
       <ScanlineBackground />
 
       <View style={[styles.header, { paddingTop: topPad + 8, backgroundColor: `${colors.background}E0` }]}>
-        <TouchableOpacity onPress={backToMenu} style={styles.backBtn}>
+        <TouchableOpacity onPress={handleSurrender} style={styles.backBtn}>
           <Feather name="chevron-left" size={20} color={colors.mutedForeground} />
         </TouchableOpacity>
 
@@ -154,7 +154,7 @@ export function GameScreen() {
           </GlowText>
           <View style={styles.statsRow}>
             <Text style={[styles.statText, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-              {t("attempt")} {guessHistory.length}/{settings.maxTries}
+              {t("attempt")} {guessHistory.length}{settings.maxTries > 0 ? `/${settings.maxTries}` : ""}
             </Text>
             <Text style={[styles.statText, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
               {settings.codeLength} {t("digits")}

@@ -573,6 +573,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       ...prev,
       phase: "lost",
       playerWon: false,
+      currentGuess: [],
     }));
   }, [clearTimers]);
 

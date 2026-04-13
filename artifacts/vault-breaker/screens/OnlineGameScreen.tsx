@@ -138,21 +138,7 @@ export function OnlineGameScreen() {
           },
         ]}
       >
-        <TouchableOpacity
-          onPress={() => {
-            Alert.alert(t("surrender"), t("confirmSurrender"), [
-              { text: t("no"), style: "cancel" },
-              {
-                text: t("yes"),
-                style: "destructive",
-                onPress: () => {
-                  surrender();
-                },
-              },
-            ]);
-          }}
-          style={styles.backBtn}
-        >
+        <TouchableOpacity onPress={handleSurrender} style={styles.backBtn}>
           <Feather name="chevron-left" size={20} color={colors.mutedForeground} />
         </TouchableOpacity>
 
@@ -170,7 +156,7 @@ export function OnlineGameScreen() {
                 },
               ]}
             >
-              {online.myHistory.length}/{settings.maxTries}
+              {online.myHistory.length}{settings.maxTries > 0 ? `/${settings.maxTries}` : ""}
             </Text>
             <Text
               style={[
