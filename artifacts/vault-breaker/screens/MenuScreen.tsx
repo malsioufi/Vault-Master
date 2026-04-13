@@ -244,7 +244,7 @@ function SettingsSection() {
 export function MenuScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { startSoloGame, language, setLanguage, t } = useGame();
+  const { startSoloGame, goOnline, language, setLanguage, t } = useGame();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
 
@@ -288,18 +288,21 @@ export function MenuScreen() {
           <TouchableOpacity
             style={[
               styles.modeBtn,
-              styles.modeBtnDisabled,
               {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
+                backgroundColor: `${colors.accent}20`,
+                borderColor: colors.accent,
+                shadowColor: colors.accent,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
               },
             ]}
-            disabled
-            activeOpacity={0.5}
+            onPress={goOnline}
+            activeOpacity={0.8}
           >
-            <Text style={[styles.modeBtnTextDisabled, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-              {t("onlineMode")} — {t("coming")} {t("soon")}
-            </Text>
+            <GlowText style={styles.modeBtnText} variant="accent">
+              {t("onlineMode")}
+            </GlowText>
           </TouchableOpacity>
         </Animated.View>
 

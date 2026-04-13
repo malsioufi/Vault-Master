@@ -1,15 +1,39 @@
 import React from "react";
 import { GameProvider, useGame } from "@/context/GameContext";
+import { useMultiplayer } from "@/context/MultiplayerContext";
 import { MenuScreen } from "@/screens/MenuScreen";
 import { GameScreen } from "@/screens/GameScreen";
 import { ResultScreen } from "@/screens/ResultScreen";
 import { OnlineScreen } from "@/screens/OnlineScreen";
+import { OnlineGameScreen } from "@/screens/OnlineGameScreen";
+import { OnlineResultScreen } from "@/screens/OnlineResultScreen";
 
 function AppRouter() {
   const { state } = useGame();
+  const { online } = useMultiplayer();
+
+  if (online.phase === "playing") {
+    return <OnlineGameScreen />;
+  }
+
+  if (online.phase === "finished") {
+    return <OnlineResultScreen />;
+  }
+
+  if (
+    online.phase === "lobby_host" ||
+    online.phase === "lobby_guest" ||
+    (online.connectionStatus === "connecting" && online.phase === "idle")
+  ) {
+    return <OnlineScreen />;
+  }
 
   if (state.phase === "menu" || state.phase === "settings") {
     return <MenuScreen />;
+  }
+
+  if (state.phase === "online") {
+    return <OnlineScreen />;
   }
 
   if (state.phase === "playing") {
@@ -18,10 +42,6 @@ function AppRouter() {
 
   if (state.phase === "won" || state.phase === "lost") {
     return <ResultScreen />;
-  }
-
-  if (state.phase === "lobby" || state.phase === "waiting") {
-    return <OnlineScreen />;
   }
 
   return <MenuScreen />;

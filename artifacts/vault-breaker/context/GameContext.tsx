@@ -19,7 +19,8 @@ export type GamePhase =
   | "won"
   | "lost"
   | "waiting"
-  | "lobby";
+  | "lobby"
+  | "online";
 
 export interface FeedbackResult {
   matches: number;
@@ -64,6 +65,7 @@ interface GameContextType {
   state: GameState;
   updateSettings: (s: Partial<GameSettings>) => void;
   startSoloGame: () => void;
+  goOnline: () => void;
   makeGuess: (guess: string[]) => void;
   surrender: () => void;
   backToMenu: () => void;
@@ -629,12 +631,18 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const sendOnlineGuess = useCallback((_guess: string[]) => {}, []);
 
+  const goOnline = useCallback(() => {
+    clearTimers();
+    setState((prev) => ({ ...prev, phase: "online" }));
+  }, [clearTimers]);
+
   return (
     <GameContext.Provider
       value={{
         state,
         updateSettings,
         startSoloGame,
+        goOnline,
         makeGuess,
         surrender,
         backToMenu,
