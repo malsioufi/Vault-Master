@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -111,6 +111,14 @@ export function DigitInput({
   const inputRef = useRef<TextInput>(null);
   const errorAnim = useSharedValue(0);
 
+  const focusedIndexRef = useRef(focusedIndex);
+  const valueRef = useRef(value);
+  const disabledRef = useRef(disabled);
+
+  useEffect(() => { focusedIndexRef.current = focusedIndex; }, [focusedIndex]);
+  useEffect(() => { valueRef.current = value; }, [value]);
+  useEffect(() => { disabledRef.current = disabled; }, [disabled]);
+
   const triggerError = useCallback((index: number) => {
     setErrorIndex(index);
     if (Platform.OS !== "web") {
@@ -126,54 +134,85 @@ export function DigitInput({
     setTimeout(() => setErrorIndex(null), 300);
   }, [errorAnim]);
 
+  const processKey = useCallback(
+    (key: string) => {
+      if (disabledRef.current) return;
+      const fi = focusedIndexRef.current;
+      const val = valueRef.current;
+
+      if (key === "Backspace" || key === "Delete") {
+        if (val[fi]) {
+          onRemove(fi);
+          if (fi > 0) setFocusedIndex(fi - 1);
+        } else if (fi > 0) {
+          setFocusedIndex(fi - 1);
+          onRemove(fi - 1);
+        }
+        return;
+      }
+
+      if (key === "Enter") {
+        const filled = val.filter(Boolean);
+        if (filled.length === length && onSubmit) onSubmit();
+        return;
+      }
+
+      if (!/^[0-9]$/.test(key)) return;
+
+      if (!allowDuplicates && val.includes(key)) {
+        triggerError(fi);
+        return;
+      }
+
+      onChange(fi, key);
+      if (Platform.OS !== "web") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+
+      if (fi < length - 1) {
+        setFocusedIndex(fi + 1);
+      } else if (fi === length - 1) {
+        const filled = [...val];
+        filled[fi] = key;
+        if (filled.filter(Boolean).length === length && onSubmit) {
+          setTimeout(onSubmit, 100);
+        }
+      }
+    },
+    [allowDuplicates, onChange, onRemove, onSubmit, length, triggerError]
+  );
+
   const handleCellPress = useCallback(
     (index: number) => {
       if (disabled) return;
       setFocusedIndex(index);
-      inputRef.current?.focus();
+      if (Platform.OS !== "web") {
+        inputRef.current?.focus();
+      }
     },
     [disabled]
   );
 
   const handleKeyPress = useCallback(
     ({ nativeEvent }: { nativeEvent: { key: string } }) => {
-      if (disabled) return;
-      const key = nativeEvent.key;
-
-      if (key === "Backspace") {
-        if (value[focusedIndex]) {
-          onRemove(focusedIndex);
-        } else if (focusedIndex > 0) {
-          setFocusedIndex(focusedIndex - 1);
-          onRemove(focusedIndex - 1);
-        }
-        return;
-      }
-
-      if (!/^[0-9]$/.test(key)) return;
-
-      if (!allowDuplicates && value.includes(key)) {
-        triggerError(focusedIndex);
-        return;
-      }
-
-      onChange(focusedIndex, key);
-      if (Platform.OS !== "web") {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
-
-      if (focusedIndex < length - 1) {
-        setFocusedIndex(focusedIndex + 1);
-      } else if (focusedIndex === length - 1) {
-        const filled = [...value];
-        filled[focusedIndex] = key;
-        if (filled.filter(Boolean).length === length && onSubmit) {
-          setTimeout(onSubmit, 100);
-        }
-      }
+      processKey(nativeEvent.key);
     },
-    [disabled, focusedIndex, value, allowDuplicates, onChange, onRemove, triggerError, length, onSubmit]
+    [processKey]
   );
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea") return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      processKey(e.key);
+    };
+
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [processKey]);
 
   const numpadRows = [
     ["1", "2", "3"],
@@ -228,6 +267,12 @@ export function DigitInput({
 
   return (
     <View style={styles.container}>
+      {Platform.OS === "web" && !disabled && (
+        <Text style={[styles.webHint, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
+          type digits or use numpad
+        </Text>
+      )}
+
       <Animated.View style={[styles.cellRow, errorStyle]}>
         {Array.from({ length }).map((_, i) => (
           <DigitCell
@@ -241,14 +286,16 @@ export function DigitInput({
         ))}
       </Animated.View>
 
-      <TextInput
-        ref={inputRef}
-        style={styles.hiddenInput}
-        onKeyPress={handleKeyPress}
-        keyboardType="number-pad"
-        caretHidden
-        editable={!disabled}
-      />
+      {Platform.OS !== "web" && (
+        <TextInput
+          ref={inputRef}
+          style={styles.hiddenInput}
+          onKeyPress={handleKeyPress}
+          keyboardType="number-pad"
+          caretHidden
+          editable={!disabled}
+        />
+      )}
 
       <View style={styles.numpad}>
         {numpadRows.map((row, ri) => (
@@ -266,7 +313,7 @@ export function DigitInput({
                     {
                       backgroundColor: isOK ? colors.primary : colors.card,
                       borderColor: isOK ? colors.primary : colors.border,
-                      opacity: isDisabledOK ? 0.3 : 1,
+                      opacity: isDisabledOK || disabled ? 0.3 : 1,
                     },
                   ]}
                   onPress={() => handleNumpadPress(key)}
@@ -355,5 +402,10 @@ const styles = StyleSheet.create({
   numpadKeyText: {
     fontSize: 18,
     fontWeight: "600",
+  },
+  webHint: {
+    fontSize: 10,
+    letterSpacing: 1,
+    opacity: 0.6,
   },
 });

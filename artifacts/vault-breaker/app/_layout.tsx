@@ -8,6 +8,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -38,7 +39,7 @@ export default function RootLayout() {
 
   if (!fontsLoaded && !fontError) return null;
 
-  return (
+  const inner = (
     <SafeAreaProvider>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
@@ -53,4 +54,28 @@ export default function RootLayout() {
       </ErrorBoundary>
     </SafeAreaProvider>
   );
+
+  if (Platform.OS === "web") {
+    return (
+      <View style={styles.webRoot}>
+        <View style={styles.webContainer}>{inner}</View>
+      </View>
+    );
+  }
+
+  return inner;
 }
+
+const styles = StyleSheet.create({
+  webRoot: {
+    flex: 1,
+    backgroundColor: "#0a0e17",
+    alignItems: "center",
+  },
+  webContainer: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 480,
+    overflow: "hidden" as any,
+  },
+});

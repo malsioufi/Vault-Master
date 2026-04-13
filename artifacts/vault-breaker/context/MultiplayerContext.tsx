@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Platform } from "react-native";
 import type { GameSettings, FeedbackResult } from "@/context/GameContext";
 
 export type OnlinePhase =
@@ -82,6 +83,13 @@ const defaultOnline: OnlineGameState = {
 const MultiplayerContext = createContext<MultiplayerContextType | null>(null);
 
 function getWsUrl(): string {
+  if (Platform.OS === "web" && typeof window !== "undefined") {
+    const isSecure = window.location.protocol === "https:";
+    const proto = isSecure ? "wss:" : "ws:";
+    const domain = process.env.EXPO_PUBLIC_DOMAIN;
+    const host = domain ?? window.location.host;
+    return `${proto}//${host}/api/ws`;
+  }
   const domain = process.env.EXPO_PUBLIC_DOMAIN ?? "";
   if (domain) return `wss://${domain}/api/ws`;
   return `ws://localhost:8080/api/ws`;
