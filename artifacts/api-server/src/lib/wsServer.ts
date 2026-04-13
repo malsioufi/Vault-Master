@@ -237,11 +237,11 @@ function broadcastGameStarted(room: Room): void {
 function isValidSettings(s: unknown): s is GameSettings {
   if (!s || typeof s !== "object") return false;
   const settings = s as Record<string, unknown>;
+  const maxTries = settings["maxTries"] as number;
   return (
     [3, 4, 5, 6].includes(settings["codeLength"] as number) &&
     typeof settings["allowDuplicates"] === "boolean" &&
-    typeof settings["maxTries"] === "number" &&
-    settings["maxTries"] >= 4 &&
-    settings["maxTries"] <= 20
+    typeof maxTries === "number" &&
+    (maxTries === 0 || (maxTries >= 4 && maxTries <= 20))
   );
 }

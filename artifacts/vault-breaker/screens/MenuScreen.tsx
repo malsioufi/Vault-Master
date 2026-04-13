@@ -80,7 +80,7 @@ function SettingsSection() {
     { value: "active", key: "activeBot" },
   ];
 
-  const maxTriesOptions = [6, 8, 10, 12];
+  const maxTriesOptions = [6, 8, 10, 12, 0];
 
   return (
     <View style={[styles.settingsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -231,7 +231,7 @@ function SettingsSection() {
                   },
                 ]}
               >
-                {n}
+                {n === 0 ? "∞" : n}
               </Text>
             </TouchableOpacity>
           ))}

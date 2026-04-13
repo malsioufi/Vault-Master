@@ -157,8 +157,10 @@ export function processGuess(
   player.guessHistory.push(entry);
 
   const won = feedback.matches === room.settings.codeLength;
+  const maxTries = room.settings.maxTries;
+  const outOfTries = maxTries > 0 && player.guessHistory.length >= maxTries;
 
-  if (won || player.guessHistory.length >= room.settings.maxTries) {
+  if (won || outOfTries) {
     clearTurnTimer(room);
     endGame(room, won ? player.role : null);
   } else {

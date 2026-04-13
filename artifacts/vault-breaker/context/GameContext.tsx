@@ -531,7 +531,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
           };
         }
 
-        if (newHistory.length >= prev.settings.maxTries) {
+        if (prev.settings.maxTries > 0 && newHistory.length >= prev.settings.maxTries) {
           return {
             ...prev,
             guessHistory: newHistory,

@@ -218,7 +218,7 @@ export function OnlineScreen() {
                 {online.settings?.allowDuplicates ?? gameState.settings.allowDuplicates
                   ? "duplicates"
                   : "no duplicates"}{" "}
-                · {online.settings?.maxTries ?? gameState.settings.maxTries}{" "}
+                · {(online.settings?.maxTries ?? gameState.settings.maxTries) === 0 ? "∞" : (online.settings?.maxTries ?? gameState.settings.maxTries)}{" "}
                 tries
               </Text>
             </View>
@@ -337,7 +337,7 @@ export function OnlineScreen() {
               {gameState.settings.allowDuplicates
                 ? "duplicates ON"
                 : "no duplicates"}{" "}
-              · {gameState.settings.maxTries} tries
+              · {gameState.settings.maxTries === 0 ? "∞" : gameState.settings.maxTries} tries
             </Text>
           </View>
           <TouchableOpacity
