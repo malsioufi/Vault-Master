@@ -174,12 +174,6 @@ export function DigitInput({
 
       if (fi < length - 1) {
         setFocusedIndex(fi + 1);
-      } else if (fi === length - 1) {
-        const filled = [...val];
-        filled[fi] = key;
-        if (filled.filter(Boolean).length === length && onSubmit) {
-          setTimeout(onSubmit, 100);
-        }
       }
     },
     [allowDuplicates, onChange, onRemove, onSubmit, length, triggerError]
