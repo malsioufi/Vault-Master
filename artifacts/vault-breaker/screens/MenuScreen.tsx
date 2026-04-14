@@ -323,7 +323,7 @@ export function MenuScreen() {
           >
             <Feather name="help-circle" size={15} color={colors.mutedForeground} />
             <Text style={[styles.howToPlayText, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-              HOW TO PLAY
+              {t("howToPlay")}
             </Text>
           </TouchableOpacity>
         </Animated.View>

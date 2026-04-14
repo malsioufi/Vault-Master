@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  I18nManager,
   Modal,
   ScrollView,
   StyleSheet,
@@ -9,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { useGame } from "@/context/GameContext";
 
 interface InstructionsModalProps {
   visible: boolean;
@@ -28,6 +30,10 @@ function ColorDot({ color, label }: { color: string; label: string }) {
 
 export function InstructionsModal({ visible, onClose }: InstructionsModalProps) {
   const colors = useColors();
+  const { t, language } = useGame();
+  const isRTL = language === "ar";
+  const textAlign = isRTL ? "right" : "left";
+  const dir = isRTL ? "rtl" : "ltr";
 
   return (
     <Modal
@@ -43,95 +49,112 @@ export function InstructionsModal({ visible, onClose }: InstructionsModalProps) 
             <View style={[styles.sheet, { backgroundColor: colors.card, borderColor: colors.primary }]}>
               <View style={styles.handle} />
 
-              <Text style={[styles.title, { color: colors.primary, fontFamily: "SpaceMono_400Regular" }]}>
-                {">"} HOW TO PLAY
+              <Text style={[styles.title, { color: colors.primary, fontFamily: "SpaceMono_400Regular", textAlign: "center" }]}>
+                {">"} {t("howToPlay")}
               </Text>
 
               <ScrollView showsVerticalScrollIndicator={false} style={styles.scroll}>
+
                 <View style={styles.section}>
-                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular" }]}>
-                    OBJECTIVE
+                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                    {t("instrObjective")}
                   </Text>
-                  <Text style={[styles.body, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                    Crack the hidden secret code before you run out of attempts. Each guess gives you feedback clues.
+                  <Text style={[styles.body, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                    {t("instrObjectiveText")}
                   </Text>
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular" }]}>
-                    FEEDBACK INDICATORS
+                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                    {t("instrFeedbackSection")}
                   </Text>
                   <View style={styles.indicators}>
                     <View style={[styles.indicatorCard, { backgroundColor: `${colors.match}15`, borderColor: colors.match }]}>
-                      <ColorDot color={colors.match} label="MATCH" />
-                      <Text style={[styles.indicatorDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                        Right digit, right position
+                      <ColorDot color={colors.match} label={t("match")} />
+                      <Text style={[styles.indicatorDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                        {t("instrMatchDesc")}
                       </Text>
                     </View>
                     <View style={[styles.indicatorCard, { backgroundColor: `${colors.shift}15`, borderColor: colors.shift }]}>
-                      <ColorDot color={colors.shift} label="SHIFT" />
-                      <Text style={[styles.indicatorDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                        Right digit, wrong position
+                      <ColorDot color={colors.shift} label={t("shift")} />
+                      <Text style={[styles.indicatorDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                        {t("instrShiftDesc")}
                       </Text>
                     </View>
                     <View style={[styles.indicatorCard, { backgroundColor: `${colors.glitch}15`, borderColor: colors.glitch }]}>
-                      <ColorDot color={colors.glitch} label="GLITCH" />
-                      <Text style={[styles.indicatorDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                        Digit not in the code at all
+                      <ColorDot color={colors.glitch} label={t("glitch")} />
+                      <Text style={[styles.indicatorDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                        {t("instrGlitchDesc")}
                       </Text>
                     </View>
                   </View>
-                  <Text style={[styles.note, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                    Note: feedback dots are shown in random order during play to avoid giving away positions.
+                  <Text style={[styles.note, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                    {t("instrFeedbackNote")}
                   </Text>
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular" }]}>
-                    GAME MODES
+                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                    {t("instrGameModes")}
                   </Text>
-                  <Text style={[styles.body, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                    <Text style={{ color: colors.primary }}>SOLO — PASSIVE BOT:{"\n"}</Text>
-                    {"  "}You guess the code alone. No time pressure.
-                    {"\n\n"}
-                    <Text style={{ color: colors.primary }}>SOLO — ACTIVE BOT:{"\n"}</Text>
-                    {"  "}Race against an AI that is simultaneously trying to crack your code too. First to break wins. Unlimited tries.
-                    {"\n\n"}
-                    <Text style={{ color: colors.accent }}>ONLINE:{"\n"}</Text>
-                    {"  "}Two real players. Each sets a secret code for the other to crack. Guess simultaneously — first to break the opponent's vault wins.
-                  </Text>
+                  <View style={styles.modeBlock}>
+                    <Text style={[styles.modeTitle, { color: colors.primary, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                      {t("instrPassiveModeTitle")}
+                    </Text>
+                    <Text style={[styles.modeDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                      {t("instrPassiveModeDesc")}
+                    </Text>
+                  </View>
+                  <View style={styles.modeBlock}>
+                    <Text style={[styles.modeTitle, { color: colors.primary, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                      {t("instrActiveModeTitle")}
+                    </Text>
+                    <Text style={[styles.modeDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                      {t("instrActiveModeDesc")}
+                    </Text>
+                  </View>
+                  <View style={styles.modeBlock}>
+                    <Text style={[styles.modeTitle, { color: colors.accent, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                      {t("instrOnlineModeTitle")}
+                    </Text>
+                    <Text style={[styles.modeDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                      {t("instrOnlineModeDesc")}
+                    </Text>
+                  </View>
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular" }]}>
-                    SETTINGS
+                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                    {t("instrSettingsSection")}
                   </Text>
-                  <Text style={[styles.body, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                    <Text style={{ color: colors.foreground }}>Code Length:{"\n"}</Text>
-                    {"  "}3–6 digits. Longer = harder.
-                    {"\n\n"}
-                    <Text style={{ color: colors.foreground }}>Allow Duplicates:{"\n"}</Text>
-                    {"  "}When ON, the same digit can appear more than once.
-                    {"\n\n"}
-                    <Text style={{ color: colors.foreground }}>AI Difficulty:{"\n"}</Text>
-                    {"  "}Controls how smart the bot guesses (Easy / Medium / Hard).
-                    {"\n\n"}
-                    <Text style={{ color: colors.foreground }}>Max Tries:{"\n"}</Text>
-                    {"  "}Limit your attempts (6–12) or set ∞ for unlimited.
-                  </Text>
+                  {[
+                    { title: "instrCodeLengthTitle", desc: "instrCodeLengthDesc" },
+                    { title: "instrDuplicatesTitle", desc: "instrDuplicatesDesc" },
+                    { title: "instrDifficultyTitle", desc: "instrDifficultyDesc" },
+                    { title: "instrMaxTriesTitle", desc: "instrMaxTriesDesc" },
+                  ].map(({ title, desc }) => (
+                    <View key={title} style={styles.settingBlock}>
+                      <Text style={[styles.settingTitle, { color: colors.foreground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                        {t(title)}
+                      </Text>
+                      <Text style={[styles.settingDesc, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                        {t(desc)}
+                      </Text>
+                    </View>
+                  ))}
                 </View>
 
                 <View style={styles.section}>
-                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular" }]}>
-                    TIPS
+                  <Text style={[styles.heading, { color: colors.accent, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                    {t("instrTipsSection")}
                   </Text>
-                  <Text style={[styles.body, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                    {"›"} Use early guesses to test many different digits at once.{"\n"}
-                    {"›"} Track SHIFT clues — the digit exists but needs to move.{"\n"}
-                    {"›"} Review your full history at the end; digits are color-coded by position accuracy.{"\n"}
-                    {"›"} You can give up at any time using the flag button — the secret will be revealed.
-                  </Text>
+                  {(["instrTip1", "instrTip2", "instrTip3", "instrTip4"] as const).map((key) => (
+                    <Text key={key} style={[styles.tip, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular", textAlign }]}>
+                      {isRTL ? "›" : "›"} {t(key)}
+                    </Text>
+                  ))}
                 </View>
+
               </ScrollView>
 
               <TouchableOpacity
@@ -140,7 +163,7 @@ export function InstructionsModal({ visible, onClose }: InstructionsModalProps) 
                 activeOpacity={0.8}
               >
                 <Text style={[styles.closeBtnText, { color: colors.primaryForeground, fontFamily: "SpaceMono_400Regular" }]}>
-                  GOT IT
+                  {t("gotIt")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -179,7 +202,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     letterSpacing: 3,
-    textAlign: "center",
   },
   scroll: {
     flexGrow: 0,
@@ -192,17 +214,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "bold",
     letterSpacing: 3,
-  },
-  body: {
-    fontSize: 12,
-    lineHeight: 20,
-    letterSpacing: 0.5,
-  },
-  note: {
-    fontSize: 10,
-    lineHeight: 16,
-    letterSpacing: 0.5,
-    fontStyle: "italic",
   },
   indicators: {
     gap: 8,
@@ -231,6 +242,50 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.5,
     marginLeft: 22,
+  },
+  note: {
+    fontSize: 10,
+    lineHeight: 16,
+    letterSpacing: 0.5,
+    fontStyle: "italic",
+  },
+  modeBlock: {
+    gap: 2,
+    marginBottom: 10,
+  },
+  modeTitle: {
+    fontSize: 11,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
+  modeDesc: {
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.5,
+  },
+  settingBlock: {
+    gap: 2,
+    marginBottom: 8,
+  },
+  settingTitle: {
+    fontSize: 11,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
+  settingDesc: {
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.5,
+  },
+  tip: {
+    fontSize: 12,
+    lineHeight: 20,
+    letterSpacing: 0.5,
+  },
+  body: {
+    fontSize: 12,
+    lineHeight: 20,
+    letterSpacing: 0.5,
   },
   closeBtn: {
     paddingVertical: 14,
