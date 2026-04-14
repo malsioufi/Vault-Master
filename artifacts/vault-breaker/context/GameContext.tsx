@@ -27,6 +27,7 @@ export interface FeedbackResult {
   shifts: number;
   glitches: number;
   icons: ("match" | "shift" | "glitch")[];
+  perDigit: ("match" | "shift" | "glitch")[];
 }
 
 export interface GuessEntry {
@@ -246,10 +247,12 @@ function evaluateGuess(guess: string[], secret: string[]): FeedbackResult {
   let shifts = 0;
   const secretCopy = [...secret];
   const guessCopy = [...guess];
+  const perDigit: ("match" | "shift" | "glitch")[] = Array(guess.length).fill("glitch");
 
   for (let i = 0; i < guess.length; i++) {
     if (guessCopy[i] === secretCopy[i]) {
       matches++;
+      perDigit[i] = "match";
       secretCopy[i] = "X";
       guessCopy[i] = "Y";
     }
@@ -260,6 +263,7 @@ function evaluateGuess(guess: string[], secret: string[]): FeedbackResult {
     const sIdx = secretCopy.indexOf(guessCopy[i]);
     if (sIdx !== -1) {
       shifts++;
+      perDigit[i] = "shift";
       secretCopy[sIdx] = "X";
     }
   }
@@ -278,7 +282,7 @@ function evaluateGuess(guess: string[], secret: string[]): FeedbackResult {
     | "glitch"
   )[];
 
-  return { matches, shifts, glitches, icons };
+  return { matches, shifts, glitches, icons, perDigit };
 }
 
 function aiGuessEasy(length: number, allowDuplicates: boolean): string[] {

@@ -163,7 +163,7 @@ export function ResultScreen() {
               { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" },
             ]}
           >
-            {guessHistory.length} / {settings.maxTries} {t("attempt").toLowerCase()}s
+            {guessHistory.length}{settings.maxTries > 0 ? ` / ${settings.maxTries}` : ""} {t("attempt").toLowerCase()}s
           </Text>
         </Animated.View>
 
@@ -178,7 +178,7 @@ export function ResultScreen() {
               {t("history")}
             </Text>
             {guessHistory.map((entry, i) => (
-              <GuessRow key={i} entry={entry} index={i} compact />
+              <GuessRow key={i} entry={entry} index={i} compact revealed />
             ))}
           </Animated.View>
         )}

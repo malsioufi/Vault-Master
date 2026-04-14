@@ -5,6 +5,7 @@ export interface FeedbackResult {
   shifts: number;
   glitches: number;
   icons: ("match" | "shift" | "glitch")[];
+  perDigit: ("match" | "shift" | "glitch")[];
 }
 
 export interface GameSettings {
@@ -38,10 +39,12 @@ export function evaluateGuess(
   let shifts = 0;
   const secretCopy = [...secret];
   const guessCopy = [...guess];
+  const perDigit: ("match" | "shift" | "glitch")[] = Array(guess.length).fill("glitch");
 
   for (let i = 0; i < guess.length; i++) {
     if (guessCopy[i] === secretCopy[i]) {
       matches++;
+      perDigit[i] = "match";
       secretCopy[i] = "X";
       guessCopy[i] = "Y";
     }
@@ -52,6 +55,7 @@ export function evaluateGuess(
     const sIdx = secretCopy.indexOf(guessCopy[i]);
     if (sIdx !== -1) {
       shifts++;
+      perDigit[i] = "shift";
       secretCopy[sIdx] = "X";
     }
   }
@@ -68,7 +72,7 @@ export function evaluateGuess(
     () => Math.random() - 0.5
   ) as ("match" | "shift" | "glitch")[];
 
-  return { matches, shifts, glitches, icons };
+  return { matches, shifts, glitches, icons, perDigit };
 }
 
 export function generateRoomCode(): string {

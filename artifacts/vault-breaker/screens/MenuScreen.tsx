@@ -17,10 +17,12 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useGame } from "@/context/GameContext";
 import { ScanlineBackground } from "@/components/ScanlineBackground";
 import { GlowText } from "@/components/GlowText";
+import { InstructionsModal } from "@/components/InstructionsModal";
 import type { Difficulty, BotMode, Language } from "@/context/GameContext";
 
 function TerminalHeader() {
@@ -187,7 +189,12 @@ function SettingsSection() {
                   borderColor: settings.botMode === value ? colors.accent : colors.border,
                 },
               ]}
-              onPress={() => updateSettings({ botMode: value })}
+              onPress={() => {
+                updateSettings({
+                  botMode: value,
+                  ...(value === "active" ? { maxTries: 0 } : {}),
+                });
+              }}
             >
               <Text
                 style={[
@@ -205,38 +212,40 @@ function SettingsSection() {
         </View>
       </View>
 
-      <View style={styles.settingRow}>
-        <Text style={[styles.settingLabel, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
-          {t("maxTries")}
-        </Text>
-        <View style={styles.optionRow}>
-          {maxTriesOptions.map((n) => (
-            <TouchableOpacity
-              key={n}
-              style={[
-                styles.optionBtn,
-                {
-                  backgroundColor: settings.maxTries === n ? colors.primary : colors.muted,
-                  borderColor: settings.maxTries === n ? colors.primary : colors.border,
-                },
-              ]}
-              onPress={() => updateSettings({ maxTries: n })}
-            >
-              <Text
+      {settings.botMode !== "active" && (
+        <View style={styles.settingRow}>
+          <Text style={[styles.settingLabel, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
+            {t("maxTries")}
+          </Text>
+          <View style={styles.optionRow}>
+            {maxTriesOptions.map((n) => (
+              <TouchableOpacity
+                key={n}
                 style={[
-                  styles.optionText,
+                  styles.optionBtn,
                   {
-                    color: settings.maxTries === n ? colors.primaryForeground : colors.foreground,
-                    fontFamily: "SpaceMono_400Regular",
+                    backgroundColor: settings.maxTries === n ? colors.primary : colors.muted,
+                    borderColor: settings.maxTries === n ? colors.primary : colors.border,
                   },
                 ]}
+                onPress={() => updateSettings({ maxTries: n })}
               >
-                {n === 0 ? "∞" : n}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.optionText,
+                    {
+                      color: settings.maxTries === n ? colors.primaryForeground : colors.foreground,
+                      fontFamily: "SpaceMono_400Regular",
+                    },
+                  ]}
+                >
+                  {n === 0 ? "∞" : n}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }
@@ -247,10 +256,12 @@ export function MenuScreen() {
   const { startSoloGame, goOnline, language, setLanguage, t } = useGame();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
+  const [showInstructions, setShowInstructions] = useState(false);
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <ScanlineBackground />
+      <InstructionsModal visible={showInstructions} onClose={() => setShowInstructions(false)} />
 
       <ScrollView
         contentContainerStyle={[
@@ -303,6 +314,17 @@ export function MenuScreen() {
             <GlowText style={styles.modeBtnText} variant="accent">
               {t("onlineMode")}
             </GlowText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.howToPlayBtn, { borderColor: colors.border, backgroundColor: colors.card }]}
+            onPress={() => setShowInstructions(true)}
+            activeOpacity={0.8}
+          >
+            <Feather name="help-circle" size={15} color={colors.mutedForeground} />
+            <Text style={[styles.howToPlayText, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
+              HOW TO PLAY
+            </Text>
           </TouchableOpacity>
         </Animated.View>
 
@@ -421,6 +443,21 @@ const styles = StyleSheet.create({
   modeBtnTextDisabled: {
     fontSize: 13,
     letterSpacing: 1,
+  },
+  howToPlayBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  howToPlayText: {
+    fontSize: 11,
+    letterSpacing: 3,
+    fontWeight: "600",
   },
   settingsCard: {
     borderRadius: 8,

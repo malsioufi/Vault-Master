@@ -4,7 +4,6 @@ import Animated, {
   FadeInUp,
 } from "react-native-reanimated";
 import {
-  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -23,6 +22,7 @@ import { DigitInput } from "@/components/DigitInput";
 import { GuessRow } from "@/components/GuessRow";
 import { TurnTimer } from "@/components/TurnTimer";
 import { FeedbackCounts, FeedbackIcons } from "@/components/FeedbackIcons";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import type { GuessEntry, FeedbackResult } from "@/context/GameContext";
 
 interface OpponentEntryRowProps {
@@ -77,6 +77,7 @@ export function OnlineGameScreen() {
   const isMyTurn =
     online.currentTurn !== null && online.currentTurn === online.role;
   const settings = online.settings!;
+  const [showSurrenderModal, setShowSurrenderModal] = useState(false);
 
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
@@ -107,11 +108,8 @@ export function OnlineGameScreen() {
   }, [currentGuess, settings.codeLength, submitGuess]);
 
   const handleSurrender = useCallback(() => {
-    Alert.alert(t("surrender"), t("confirmSurrender"), [
-      { text: t("no"), style: "cancel" },
-      { text: t("yes"), style: "destructive", onPress: surrender },
-    ]);
-  }, [surrender, t]);
+    setShowSurrenderModal(true);
+  }, []);
 
   const convertToGuessEntry = (entry: {
     guess?: string[];
@@ -126,6 +124,16 @@ export function OnlineGameScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
+      <ConfirmModal
+        visible={showSurrenderModal}
+        title={t("surrender")}
+        message={t("confirmSurrender")}
+        confirmText={t("yes")}
+        cancelText={t("no")}
+        dangerous
+        onConfirm={() => { setShowSurrenderModal(false); surrender(); }}
+        onCancel={() => setShowSurrenderModal(false)}
+      />
       <ScanlineBackground />
 
       <View

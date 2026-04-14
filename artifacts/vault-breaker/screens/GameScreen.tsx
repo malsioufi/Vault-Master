@@ -9,7 +9,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import {
-  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -27,6 +26,7 @@ import { DigitInput } from "@/components/DigitInput";
 import { GuessRow } from "@/components/GuessRow";
 import { TurnTimer } from "@/components/TurnTimer";
 import { FeedbackCounts } from "@/components/FeedbackIcons";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import type { GuessEntry } from "@/context/GameContext";
 
 function BotGuessPanel({ entries }: { entries: GuessEntry[] }) {
@@ -81,6 +81,7 @@ export function GameScreen() {
   const botPad = Platform.OS === "web" ? 34 + 80 : insets.bottom + 80;
 
   const { settings, currentGuess, guessHistory, botGuessHistory, isPlayerTurn, botMode } = state;
+  const [showSurrenderModal, setShowSurrenderModal] = useState(false);
 
   const pulse = useSharedValue(1);
 
@@ -133,14 +134,21 @@ export function GameScreen() {
   }, [currentGuess, settings.codeLength, makeGuess]);
 
   const handleSurrender = useCallback(() => {
-    Alert.alert(t("surrender"), t("confirmSurrender"), [
-      { text: t("no"), style: "cancel" },
-      { text: t("yes"), style: "destructive", onPress: surrender },
-    ]);
-  }, [surrender, t]);
+    setShowSurrenderModal(true);
+  }, []);
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
+      <ConfirmModal
+        visible={showSurrenderModal}
+        title={t("surrender")}
+        message={t("confirmSurrender")}
+        confirmText={t("yes")}
+        cancelText={t("no")}
+        dangerous
+        onConfirm={() => { setShowSurrenderModal(false); surrender(); }}
+        onCancel={() => setShowSurrenderModal(false)}
+      />
       <ScanlineBackground />
 
       <View style={[styles.header, { paddingTop: topPad + 8, backgroundColor: `${colors.background}E0` }]}>
