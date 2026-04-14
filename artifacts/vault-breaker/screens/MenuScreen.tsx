@@ -20,9 +20,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useGame } from "@/context/GameContext";
+import { useDailyPuzzle } from "@/context/DailyPuzzleContext";
 import { ScanlineBackground } from "@/components/ScanlineBackground";
 import { GlowText } from "@/components/GlowText";
 import { InstructionsModal } from "@/components/InstructionsModal";
+import { getDailyDateStr } from "@/utils/dailyPuzzle";
 import type { Difficulty, BotMode, Language } from "@/context/GameContext";
 
 function TerminalHeader() {
@@ -254,9 +256,14 @@ export function MenuScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { startSoloGame, goOnline, language, setLanguage, t } = useGame();
+  const { daily, startDaily } = useDailyPuzzle();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
   const [showInstructions, setShowInstructions] = useState(false);
+
+  const today = getDailyDateStr();
+  const playedToday = !!(daily.todayRecord && daily.todayRecord.dateStr === today);
+  const dailyWon = daily.todayRecord?.won ?? false;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -314,6 +321,40 @@ export function MenuScreen() {
             <GlowText style={styles.modeBtnText} variant="accent">
               {t("onlineMode")}
             </GlowText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.modeBtn,
+              {
+                backgroundColor: playedToday ? `${dailyWon ? colors.warning : colors.destructive}15` : `${colors.warning}15`,
+                borderColor: playedToday ? (dailyWon ? colors.warning : colors.destructive) : colors.warning,
+                shadowColor: colors.warning,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.25,
+                shadowRadius: 8,
+              },
+            ]}
+            onPress={startDaily}
+            activeOpacity={0.8}
+          >
+            <View style={styles.dailyRow}>
+              <GlowText style={[styles.modeBtnText, { fontSize: 14 }]} variant="primary">
+                {"🔐 "}{t("dailyPuzzle")}
+              </GlowText>
+              {playedToday && (
+                <View style={[styles.playedBadge, { backgroundColor: dailyWon ? colors.warning : colors.destructive }]}>
+                  <Text style={[styles.playedBadgeText, { color: colors.primaryForeground, fontFamily: "SpaceMono_400Regular" }]}>
+                    {dailyWon ? "✓" : "✗"}
+                  </Text>
+                </View>
+              )}
+            </View>
+            {daily.streak > 0 && (
+              <Text style={[styles.streakText, { color: colors.warning, fontFamily: "SpaceMono_400Regular" }]}>
+                🔥 {daily.streak} {t("streak").toLowerCase()}
+              </Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -458,6 +499,27 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 3,
     fontWeight: "600",
+  },
+  dailyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  playedBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  playedBadgeText: {
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  streakText: {
+    fontSize: 11,
+    letterSpacing: 1,
+    marginTop: 4,
   },
   settingsCard: {
     borderRadius: 8,

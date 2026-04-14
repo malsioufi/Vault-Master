@@ -13,6 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MultiplayerProvider } from "@/context/MultiplayerContext";
+import { DailyPuzzleProvider } from "@/context/DailyPuzzleContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,9 +46,11 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <GestureHandlerRootView>
             <KeyboardProvider>
-              <MultiplayerProvider>
-                <RootLayoutNav />
-              </MultiplayerProvider>
+              <DailyPuzzleProvider>
+                <MultiplayerProvider>
+                  <RootLayoutNav />
+                </MultiplayerProvider>
+              </DailyPuzzleProvider>
             </KeyboardProvider>
           </GestureHandlerRootView>
         </QueryClientProvider>
