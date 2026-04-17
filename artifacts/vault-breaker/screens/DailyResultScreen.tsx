@@ -86,21 +86,36 @@ function CountdownTimer() {
 export function DailyResultScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { t } = useGame();
+  const { t, language } = useGame();
   const { daily, backToMenu } = useDailyPuzzle();
   const { config, guessHistory, streak, longestStreak, todayRecord } = daily;
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
   const [copied, setCopied] = useState(false);
 
-  if (!config) return null;
-
   const won = todayRecord?.won ?? false;
   const attempts = todayRecord?.attempts ?? guessHistory.length;
   const displayHistory = todayRecord?.guessHistory ?? guessHistory;
 
+  const getAppUrl = useCallback((): string => {
+    if (Platform.OS === "web" && typeof window !== "undefined") {
+      return window.location.origin;
+    }
+    const domain = process.env.EXPO_PUBLIC_DOMAIN;
+    return domain ? `https://${domain}` : "https://vault-breaker.replit.app";
+  }, []);
+
   const handleShare = useCallback(() => {
-    const text = buildShareText(config.puzzleNumber, won, attempts, config.maxTries, displayHistory);
+    if (!config) return;
+    const text = buildShareText(
+      config.puzzleNumber,
+      won,
+      attempts,
+      config.maxTries,
+      displayHistory,
+      language,
+      getAppUrl()
+    );
     if (Platform.OS === "web" && navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         setCopied(true);
@@ -111,7 +126,9 @@ export function DailyResultScreen() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  }, [config, won, attempts, displayHistory]);
+  }, [config, won, attempts, displayHistory, language, getAppUrl]);
+
+  if (!config) return null;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>

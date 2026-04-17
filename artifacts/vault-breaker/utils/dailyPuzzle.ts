@@ -136,14 +136,29 @@ export function buildShareText(
   won: boolean,
   attempts: number,
   maxTries: number,
-  guessHistory: { feedback: FeedbackResult }[]
+  guessHistory: { feedback: FeedbackResult }[],
+  language: "en" | "ar",
+  appUrl: string
 ): string {
-  const header = `🔐 Vault Breaker Daily #${puzzleNumber}`;
-  const result = won ? `${attempts}/${maxTries}` : `X/${maxTries}`;
   const rows = guessHistory.map((entry) =>
     entry.feedback.perDigit
       .map((s) => (s === "match" ? "🟢" : s === "shift" ? "🟡" : "⬛"))
       .join("")
   );
-  return [header, result, "", ...rows].join("\n");
+
+  if (language === "ar") {
+    const header = `🔐 Vault Breaker - الأحجية #${puzzleNumber}`;
+    const challenge = won
+      ? `فككت الخزينة في ${attempts}/${maxTries} محاولات 😏\nهل تستطيع التغلب عليّ؟`
+      : `خزينة #${puzzleNumber} هزمتني اليوم (X/${maxTries}) 💀\nأتحداك أن تفككها!`;
+    const link = `👉 جرّب اليوم:\n${appUrl}`;
+    return [header, "", challenge, "", ...rows, "", link].join("\n");
+  }
+
+  const header = `🔐 Vault Breaker Daily #${puzzleNumber}`;
+  const challenge = won
+    ? `I cracked Vault #${puzzleNumber} in ${attempts}/${maxTries} tries. Beat that! 😏`
+    : `Vault #${puzzleNumber} got me today (X/${maxTries}) 💀\nThink you can crack it? I dare you.`;
+  const link = `👉 Play today's vault:\n${appUrl}`;
+  return [header, "", challenge, "", ...rows, "", link].join("\n");
 }
