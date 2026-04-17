@@ -29,7 +29,7 @@ export function DailyPuzzleScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t, language } = useGame();
-  const { daily, makeGuess, surrender } = useDailyPuzzle();
+  const { daily, makeGuess, surrender, backToMenu } = useDailyPuzzle();
   const { config, guessHistory, streak } = daily;
   const scrollRef = useRef<ScrollView>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -37,8 +37,6 @@ export function DailyPuzzleScreen() {
   const [currentGuess, setCurrentGuess] = useState<string[]>([]);
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const isRTL = language === "ar";
-
-  if (!config) return null;
 
   const pulse = useSharedValue(1);
 
@@ -74,11 +72,22 @@ export function DailyPuzzleScreen() {
   }, []);
 
   const handleSubmit = useCallback(() => {
+    if (!config) return;
     const filled = currentGuess.filter(Boolean);
     if (filled.length !== config.codeLength) return;
     makeGuess([...currentGuess]);
     setCurrentGuess([]);
-  }, [currentGuess, config.codeLength, makeGuess]);
+  }, [currentGuess, config, makeGuess]);
+
+  const handleBack = useCallback(() => {
+    if (guessHistory.length > 0) {
+      setShowSurrenderModal(true);
+    } else {
+      backToMenu();
+    }
+  }, [guessHistory.length, backToMenu]);
+
+  if (!config) return null;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -96,7 +105,7 @@ export function DailyPuzzleScreen() {
       <ScanlineBackground />
 
       <View style={[styles.header, { paddingTop: topPad + 8, backgroundColor: `${colors.background}E0`, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => setShowSurrenderModal(true)} style={styles.backBtn}>
+        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
           <Feather name="chevron-left" size={20} color={colors.mutedForeground} />
         </TouchableOpacity>
 
@@ -108,9 +117,11 @@ export function DailyPuzzleScreen() {
             <Text style={[styles.statText, { color: colors.mutedForeground, fontFamily: "SpaceMono_400Regular" }]}>
               {t("attempt")} {guessHistory.length}/{config.maxTries}
             </Text>
-            <Text style={[styles.statText, { color: colors.warning, fontFamily: "SpaceMono_400Regular" }]}>
-              🔥 {streak}
-            </Text>
+            {streak > 0 && (
+              <Text style={[styles.statText, { color: colors.warning, fontFamily: "SpaceMono_400Regular" }]}>
+                🔥 {streak}
+              </Text>
+            )}
           </View>
         </View>
 
