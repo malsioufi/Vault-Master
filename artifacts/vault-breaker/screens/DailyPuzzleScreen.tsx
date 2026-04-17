@@ -33,7 +33,7 @@ export function DailyPuzzleScreen() {
   const { config, guessHistory, streak } = daily;
   const scrollRef = useRef<ScrollView>(null);
   const topPad = Platform.OS === "web" ? 67 : insets.top;
-  const botPad = Platform.OS === "web" ? 34 + 80 : insets.bottom + 80;
+  const botPad = Platform.OS === "web" ? 34 : insets.bottom;
   const [currentGuess, setCurrentGuess] = useState<string[]>([]);
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const isRTL = language === "ar";
@@ -158,28 +158,10 @@ export function DailyPuzzleScreen() {
           length={config.codeLength}
           value={currentGuess}
           allowDuplicates={config.allowDuplicates}
-          onChangeDigit={setDigit}
-          onRemoveDigit={removeDigit}
+          onChange={setDigit}
+          onRemove={removeDigit}
           onSubmit={handleSubmit}
         />
-        <TouchableOpacity
-          style={[
-            styles.submitBtn,
-            {
-              backgroundColor: colors.warning,
-              shadowColor: colors.warning,
-              shadowOffset: { width: 0, height: 0 },
-              shadowOpacity: 0.4,
-              shadowRadius: 10,
-            },
-          ]}
-          onPress={handleSubmit}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.submitText, { color: colors.primaryForeground, fontFamily: "SpaceMono_400Regular" }]}>
-            {t("submit")}
-          </Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -215,15 +197,5 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 10,
     borderTopWidth: 1,
-  },
-  submitBtn: {
-    paddingVertical: 14,
-    borderRadius: 6,
-    alignItems: "center",
-  },
-  submitText: {
-    fontSize: 13,
-    fontWeight: "bold",
-    letterSpacing: 4,
   },
 });
