@@ -142,7 +142,7 @@ export function buildShareText(
 ): string {
   const rows = guessHistory.map((entry) =>
     entry.feedback.perDigit
-      .map((s) => (s === "match" ? "🟢" : s === "shift" ? "🟡" : "⬛"))
+      .map((s) => (s === "match" ? "🟩" : s === "shift" ? "🟨" : "🟥"))
       .join("")
   );
 
