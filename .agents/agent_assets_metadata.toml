@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "fMQYK8ARK2vxdcFal-qMz"
@@ -12,3 +11,9 @@ id = "ty1fP-wDuXZyIt4FicefU"
 uri = "file://artifacts/vault-breaker/assets/images/splash.png"
 type = "image"
 title = "generated_image"
+
+[[outputs]]
+id = "DzxT7smdsSl9y38r5CkqC"
+uri = "file://HOSTING.md"
+type = "text"
+title = "Vault Breaker — Hosting Requirements"
